@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API_KEY, BASURL } from "./Api/Api";
 import Image from "next/image";
 import Link from "next/link";
-import { Compass } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface Movie {
   id: string;
@@ -11,22 +11,20 @@ interface Movie {
   release_date: string;
 }
 
-export default function Trending() {
+export default function HotSection() {
   const [movies, setMovies] = useState<Movie[]>([]);
   useEffect(() => {
-    fetch(`${BASURL}/trending/movie/week?api_key=${API_KEY}`)
+    fetch(`${BASURL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`)
       .then((res) => res.json())
-      .then((data) => setMovies(data.results))
-      .catch((err) => console.error(err));
+      .then((data) => setMovies(data.results));
   }, []);
-
   return (
     <section className="p-0 m-0 w-full">
       <h2 className="text-2xl ml-20 mb-5 text-white font-extrabold flex items-center gap-2 ">
         <span>
-          <Compass size={24} className="text-white" />
+            <Star className="w-6 h-6 text-yellow-400" />
         </span>{" "}
-        <i>Trending Now</i>
+        <i>Hight Score Featured</i>
       </h2>
       <div className="flex justify-start  w-[95%] gap-5 space-y-5 mx-auto overflow-x-auto no-scrollbar">
         {movies.map((movie) => (

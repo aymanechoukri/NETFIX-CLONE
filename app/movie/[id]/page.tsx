@@ -1,9 +1,10 @@
 import { API_KEY, BASURL } from "@/src/Api/Api";
 import WatchButton from "@/src/Button";
+import FavoriteBtn from "@/src/FavoriteBtn";
 import Image from "next/image";
 
 interface Props {
-  params: Promise<{ id: number }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function Moviepage({ params }: Props) {
@@ -19,7 +20,7 @@ export default async function Moviepage({ params }: Props) {
     <section className="p-0 m-0 overflow-hidden">
       <div
         key={movie.id}
-        className="flex space-x-5 p-4 justify-center w-[95%] mx-auto"
+        className="md:flex space-x-5 p-4 justify-center md:w-[95%]  mx-auto"
       >
         <Image
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -36,8 +37,9 @@ export default async function Moviepage({ params }: Props) {
           <span className="text-gray-300">
             The time of publication: <i>{movie.release_date}</i>
           </span>
-          <div className="flex justify-center items-end w-full mt-30">
+          <div className="flex justify-center items-end w-full mt-30 gap-2">
             <WatchButton />
+            <FavoriteBtn />
           </div>
         </div>
       </div>

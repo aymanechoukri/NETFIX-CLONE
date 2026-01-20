@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { API_KEY, BASURL } from "./Api/Api";
-import Image from "next/image";
 import Link from "next/link";
-import { Compass } from "lucide-react";
+import Image from "next/image"
+import { FireExtinguisherIcon } from "lucide-react";
 
 interface Movie {
   id: string;
@@ -11,22 +11,20 @@ interface Movie {
   release_date: string;
 }
 
-export default function Trending() {
+export default function HotSearching() {
   const [movies, setMovies] = useState<Movie[]>([]);
   useEffect(() => {
-    fetch(`${BASURL}/trending/movie/week?api_key=${API_KEY}`)
+    fetch(`${BASURL}/movie/popular?api_key=${API_KEY}`)
       .then((res) => res.json())
-      .then((data) => setMovies(data.results))
-      .catch((err) => console.error(err));
+      .then((data) => setMovies(data.results));
   }, []);
-
   return (
     <section className="p-0 m-0 w-full">
       <h2 className="text-2xl ml-20 mb-5 text-white font-extrabold flex items-center gap-2 ">
         <span>
-          <Compass size={24} className="text-white" />
+            <FireExtinguisherIcon size={18} />
         </span>{" "}
-        <i>Trending Now</i>
+        <i>Hot Searching</i>
       </h2>
       <div className="flex justify-start  w-[95%] gap-5 space-y-5 mx-auto overflow-x-auto no-scrollbar">
         {movies.map((movie) => (

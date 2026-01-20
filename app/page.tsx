@@ -1,7 +1,10 @@
 "use client";
+import HotSearching from "@/src/HotSearching";
 import Trending from "@/src/Trending";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Line from "@/src/Components/Line"
+import HotSection from "@/src/HotSection";
 
 export default function Home() {
   const Movie = [
@@ -13,8 +16,8 @@ export default function Home() {
     { img: "/image/movie6.jpg" },
   ];
   return (
-    <main className="w-full p-0 m-0">
-      <h1 className="text-white text-3xl font-bold text-center mt-10 mb-10">
+    <main className="w-full p-0 m-0 overflow-x-hidden">
+      <h1 className="text-5xl font-extrabold text-center mt-10 mb-10 bg-linear-to-r from-[#A2226E] to-[#00E5FF] bg-clip-text text-transparent ">
         Welcome to the Stream Flex
       </h1>
       <div className="overflow-hidden bg-[#1212129a] z-50 mask-t-from-50% mask-b-from-20% mask-b-to-80%">
@@ -44,6 +47,10 @@ export default function Home() {
         <div className="absolute z-50 right-0 top-100 shadow-[0_0_300px_200px_rgba(255,255,255,0.7)] rounded-2xl"></div>
       </div>
         <Trending />
+        <Line />
+        <HotSearching />
+        <Line />
+        <HotSection />
     </main>
   );
 }
