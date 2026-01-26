@@ -11,11 +11,10 @@ export default async function Moviepage({ params }: Props) {
   const { id } = await params;
   const res = await fetch(
     `${BASURL}/movie/${id}?api_key=${API_KEY}&language=en-US`,
-    { cache: "no-store" }
+    { cache: "no-store" },
   );
 
   const movie = await res.json();
-  console.log(movie);
   return (
     <section className="p-0 m-0 overflow-hidden">
       <div
@@ -39,7 +38,14 @@ export default async function Moviepage({ params }: Props) {
           </span>
           <div className="flex justify-center items-end w-full mt-30 gap-2">
             <WatchButton />
-            <FavoriteBtn />
+            <FavoriteBtn
+              movie={{
+                id: movie.id,
+                title: movie.title,
+                poster_path: movie.poster_path,
+                release_date: movie.release_date,
+              }}
+            />
           </div>
         </div>
       </div>

@@ -20,9 +20,11 @@ export default function Header() {
               Home
             </li>
             </Link>
+            <Link href={"/list"}>
             <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
               My List
             </li>
+            </Link>
             <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
               About us
             </li>

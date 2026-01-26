@@ -1,5 +1,6 @@
 import Header from "@/src/Components/Header";
 import "./globals.css";
+import ListProvider from "@/src/Context/ListProvider";
 
 export default function RootLayout({
   children,
@@ -9,8 +10,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="p-0 m-0 bg-[#121212]">
-        <Header />
-        {children}
+        <ListProvider>
+          <Header />
+          {children}
+        </ListProvider>
       </body>
     </html>
   );

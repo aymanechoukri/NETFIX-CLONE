@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Compass } from "lucide-react";
 
-interface Movie {
+export interface Movie {
   id: string;
   title: string;
   poster_path: string;
