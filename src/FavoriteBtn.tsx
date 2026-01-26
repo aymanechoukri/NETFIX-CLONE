@@ -11,7 +11,10 @@ export default function Button({movie} : Props) {
 const { setList } = useList()
 
 function addFavorite() {
-  setList(priv => [...priv, movie])
+  setList(prev => {
+    if (prev.some(m => m.id === movie.id)) return prev;
+    return [...prev, movie];
+  });
 }
 
   return (
