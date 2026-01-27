@@ -1,31 +1,39 @@
 "use client";
 import { Heart } from "lucide-react";
 import { useList } from "./Context/ListContext";
-import { Movie } from "./Trending";
+import { Movie } from "./types/movie";
 
-interface Props {
+interface FavoriteButtonProps {
   movie: Movie;
 }
 
-export default function Button({movie} : Props) {
-const { setList } = useList()
+export default function FavoriteButton({ movie }: FavoriteButtonProps) {
+  const { addMovie, removeMovie, isFavorite } = useList();
+  const isInFavorites = isFavorite(movie.id);
 
-function addFavorite() {
-  setList(prev => {
-    if (prev.some(m => m.id === movie.id)) return prev;
-    return [...prev, movie];
-  });
-}
+  const toggleFavorite = () => {
+    if (isInFavorites) {
+      removeMovie(movie.id);
+    } else {
+      addMovie(movie);
+    }
+  };
 
   return (
     <button
-    onClick={addFavorite}
+      onClick={toggleFavorite}
+      aria-label={isInFavorites ? `Remove ${movie.title} from favorites` : `Add ${movie.title} to favorites`}
       className="bg-white/30 px-5 py-2 rounded-lg backdrop-blur-lg active:scale-95 transition duration-300 cursor-pointer font-extrabold flex justify-center items-center gap-2"
     >
       <span>
-        <Heart className="inline text-red-500" size={20} />
+        <Heart
+          className="inline text-red-500"
+          size={20}
+          fill={isInFavorites ? "currentColor" : "none"}
+        />
       </span>
-      Favorite
+      {isInFavorites ? "Remove" : "Favorite"}
     </button>
   );
 }
+

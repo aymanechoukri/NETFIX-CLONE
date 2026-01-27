@@ -15,19 +15,19 @@ export default function Header() {
             className="h-20 w-25"
             priority
           />
-          <ul className="flex justify-center items-center space-x-1 w-[80%]">
+          <ul className="flex justify-center items-center space-x-2">
             <Link href={"/"}>
-              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+              <li className="font-extrabold md:text-lg txet-md p-1 md:px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
                 Home
               </li>
             </Link>
             <Link href={"/list"}>
-              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+              <li className="font-extrabold md:text-lg txet-md p-1 md:px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
                 My List
               </li>
             </Link>
             <Link href={"/about"}>
-              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+              <li className="font-extrabold md:text-lg txet-md p-1 md:px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
                 About us
               </li>
             </Link>
