@@ -1,42 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { API_KEY, BASURL } from "./Api/Api";
+import { useEffect, useState, useCallback } from "react";
+import { fetchFromTMDB } from "./Api/Api";
 import Image from "next/image";
 import Link from "next/link";
-import { Compass } from "lucide-react";
+import { Compass, RefreshCw } from "lucide-react";
 import { Movie } from "@/src/types/movie";
 
 export default function Trending() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
+  const fetchMovies = useCallback(async (isRetry = false) => {
+    try {
+      if (!isRetry) {
         setLoading(true);
         setError(null);
-        const res = await fetch(
-          `${BASURL}/trending/movie/week?api_key=${API_KEY}`
-        );
-        
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        
-        const data = await res.json();
-        setMovies(data.results || []);
-      } catch (err) {
-        console.error("Failed to fetch trending movies:", err);
-        setError("Failed to load trending movies. Please try again later.");
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchMovies();
+      
+      const data = await fetchFromTMDB('/trending/movie/week');
+      setMovies(data.results || []);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to load trending movies";
+      console.error("Failed to fetch trending movies:", err);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchMovies();
+  }, [fetchMovies, retryCount]);
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+  };
 
   if (loading) {
     return (
@@ -71,8 +73,15 @@ export default function Trending() {
           </span>{" "}
           <i>Trending Now</i>
         </h2>
-        <div className="flex justify-center items-center w-full py-10">
-          <p className="text-red-400">{error}</p>
+        <div className="flex flex-col justify-center items-center w-full py-10 gap-4">
+          <p className="text-red-400 text-center">{error}</p>
+          <button 
+            onClick={handleRetry}
+            className="flex items-center gap-2 px-4 py-2 bg-[#A2226E] text-white rounded-lg hover:bg-[#8a1d5e] transition-colors"
+          >
+            <RefreshCw size={16} />
+            Try Again
+          </button>
         </div>
       </section>
     );
