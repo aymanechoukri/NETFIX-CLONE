@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,20 +17,28 @@ export default function Header() {
           />
           <ul className="flex justify-center items-center space-x-1 w-[80%]">
             <Link href={"/"}>
-            <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
-              Home
-            </li>
+              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+                Home
+              </li>
             </Link>
             <Link href={"/list"}>
-            <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
-              My List
-            </li>
+              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+                My List
+              </li>
             </Link>
-            <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
-              About us
-            </li>
+            <Link href={"/about"}>
+              <li className="font-extrabold p-1 px-5 hover:bg-white/10 hover:backdrop-blur-2xl rounded-3xl active:scale-95 transition-all duration-75">
+                About us
+              </li>
+            </Link>
           </ul>
         </div>
+        <Link href={"/search"}>
+          <Search
+            className="bg-black/60 text-white p-2 rounded-full backdrop-blur-2xl active:scale-95"
+            size={35}
+          />
+        </Link>
       </nav>
     </header>
   );

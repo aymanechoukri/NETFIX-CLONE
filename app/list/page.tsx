@@ -7,9 +7,11 @@ import Link from "next/link";
 export default function List() {
   const { list, setList } = useList();
 
-  function removeList(id) {
-    setList((prev) => prev.filter((u) => u.id !== id));
-  }
+function removeList(id: number) {
+  setList(prev => prev.filter(u => String(u.id) !== String(id)));
+}
+
+
   return (
     <div className="w-[95%] mx-auto flex md:justify-start gap-4 overflow-x-auto no-scrollbar">
       {list.length === 0 ? (
