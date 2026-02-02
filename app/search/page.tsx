@@ -6,6 +6,7 @@ import Link from "next/link";
 import { API_KEY, BASURL } from "@/src/Api/Api";
 import { Movie } from "@/src/types/movie";
 import { Search, AlertCircle } from "lucide-react";
+import { NEXT_QUERY_PARAM_PREFIX } from "next/dist/lib/constants";
 
 export default function SearchPage() {
   const [search, setSearch] = useState<string>("");
@@ -44,6 +45,7 @@ export default function SearchPage() {
           setLoading(false);
         }
       };
+
 
       fetchMovies();
     }, 500); // 500ms debounce
