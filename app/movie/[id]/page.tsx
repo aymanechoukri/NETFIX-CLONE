@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { API_KEY, BASURL } from "@/src/Api/Api";
 import WatchButton from "@/src/Button";
 import FavoriteButton from "@/src/FavoriteBtn";
 import Image from "next/image";
 import { Movie } from "@/src/types/movie";
+import { getMovieDetails } from "@/src/lib/tmdbServer";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -43,19 +43,17 @@ function ErrorDisplay({ message }: { message: string }) {
 
 // Movie content component
 async function MovieContent({ id }: { id: string }) {
-  const res = await fetch(
-    `${BASURL}/movie/${id}?api_key=${API_KEY}&language=en-US`,
-    { cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    const errorMessage = res.status === 404
-      ? "Movie not found"
-      : `Failed to fetch movie (status: ${res.status})`;
-    return <ErrorDisplay message={errorMessage} />;
+  if (!id || !/^\d+$/.test(id)) {
+    return <ErrorDisplay message="Invalid movie identifier." />;
   }
 
-  const movie: Movie = await res.json();
+  let movie: Movie;
+  try {
+    movie = await getMovieDetails(id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to fetch movie details";
+    return <ErrorDisplay message={message} />;
+  }
 
   // Validate required fields
   if (!movie.id || !movie.title) {
@@ -117,4 +115,3 @@ export default async function MoviePage({ params }: Props) {
     </Suspense>
   );
 }
-

@@ -1,12 +1,31 @@
 "use client";
+
+import { useSyncExternalStore } from "react";
 import { useList } from "@/src/Context/ListContext";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Movie } from "@/src/types/movie";
 
+const emptySubscribe = () => () => {};
+
 export default function List() {
   const { list, removeMovie } = useList();
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  if (!mounted) {
+    return (
+      <div className="w-[95%] mx-auto flex md:justify-start gap-4 overflow-x-auto no-scrollbar py-8">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="w-[200px] h-[300px] bg-gray-800/60 rounded-xl animate-pulse shrink-0" />
+        ))}
+      </div>
+    );
+  }
 
   if (!list || list.length === 0) {
     return (
@@ -20,7 +39,7 @@ export default function List() {
   }
 
   return (
-    <div className="w-[95%] mx-auto flex md:justify-start gap-4 overflow-x-auto no-scrollbar">
+    <div className="w-[95%] mx-auto flex md:justify-start gap-4 overflow-x-auto no-scrollbar py-6">
       {list.map((movie: Movie) => (
         <Link href={`/movie/${movie.id}`} key={movie.id}>
           <div className="w-[200px] z-40 shrink-0">
@@ -43,9 +62,9 @@ export default function List() {
                 removeMovie(movie.id);
               }}
               aria-label={`Remove ${movie.title} from favorites`}
-              className="relative top-[-40px] left-2 bg-black p-2 rounded-full text-white z-50 active:scale-95 hover:text-red-600 transition-colors"
+              className="relative top-[-40px] left-2 bg-black/80 hover:bg-black p-2 rounded-full text-white z-50 active:scale-95 hover:text-red-500 transition-colors cursor-pointer"
             >
-              <Trash2 size={30} />
+              <Trash2 size={24} />
             </button>
             <div className="px-3 space-y-1">
               <h2 className="font-extrabold text-white truncate">
@@ -61,4 +80,3 @@ export default function List() {
     </div>
   );
 }
-

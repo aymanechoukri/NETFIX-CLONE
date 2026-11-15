@@ -100,11 +100,13 @@ netflix-clone/
    ```
 
 3. **Set up environment variables**
-   Create a `.env.local` file in the root directory:
+   Create a `.env.local` file in the root directory (or copy from `.env.example`):
    ```env
-   NEXT_PUBLIC_TMDB_API_KEY=your_api_key_here
-   NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
+   TMDB_API_KEY=your_tmdb_api_key_here
+   TMDB_BASE_URL=https://api.themoviedb.org/3
    ```
+
+   > 🔒 **Security Best Practice**: The API key is kept strictly server-side in `TMDB_API_KEY` and is never exposed to the client bundle. All movie requests route through Next.js secure API handlers.
 
    > ⚠️ Get your free TMDB API key from [The Movie Database](https://www.themoviedb.org/settings/api)
 
@@ -229,10 +231,10 @@ npm run lint
 
 ## 🔐 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_TMDB_API_KEY` | Your TMDB API key | Yes |
-| `NEXT_PUBLIC_TMDB_BASE_URL` | TMDB API base URL | No (default provided) |
+| Variable | Description | Required | Scope |
+|----------|-------------|----------|-------|
+| `TMDB_API_KEY` | Your TMDB API key | Yes | Server-only (Secure) |
+| `TMDB_BASE_URL` | TMDB API base URL | No (default: https://api.themoviedb.org/3) | Server-only |
 
 ## 🤝 Contributing
 

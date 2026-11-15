@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { API_KEY, BASURL } from "@/src/Api/Api";
 import { Movie } from "@/src/types/movie";
 import { Search, AlertCircle } from "lucide-react";
-import { NEXT_QUERY_PARAM_PREFIX } from "next/dist/lib/constants";
 
 export default function SearchPage() {
   const [search, setSearch] = useState<string>("");
@@ -14,44 +12,64 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleInputChange = (value: string) => {
+    setSearch(value);
+    if (!value.trim()) {
+      setResults([]);
+      setError(null);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Debounce search to avoid too many API calls
+    const trimmed = search.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    // Debounce search to prevent excessive API requests
     const timer = setTimeout(() => {
-      if (search.trim() === "") {
-        setResults([]);
-        setError(null);
-        return;
-      }
+      let isSubscribed = true;
+      setLoading(true);
+      setError(null);
 
-      const fetchMovies = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-          const res = await fetch(
-            `${BASURL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(search)}`
-          );
-
+      fetch(`/api/movies/search?query=${encodeURIComponent(trimmed)}`)
+        .then(async (res) => {
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            let errorMsg = `Search failed (${res.status})`;
+            try {
+              const data = await res.json();
+              if (data.error) errorMsg = data.error;
+            } catch {
+              // Ignore JSON parse error on bad status
+            }
+            throw new Error(errorMsg);
           }
+          return res.json();
+        })
+        .then((data) => {
+          if (isSubscribed) {
+            setResults(Array.isArray(data.results) ? data.results : []);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (isSubscribed) {
+            console.error("Failed to search movies:", err);
+            setError(err instanceof Error ? err.message : "Failed to search movies.");
+            setLoading(false);
+          }
+        });
 
-          const data = await res.json();
-          setResults(data.results || []);
-        } catch (err) {
-          console.error("Failed to search movies:", err);
-          setError("Failed to search movies. Please try again later.");
-        } finally {
-          setLoading(false);
-        }
+      return () => {
+        isSubscribed = false;
       };
-
-
-      fetchMovies();
-    }, 500); // 500ms debounce
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [search]);
+
+  const activeResults = search.trim() ? results : [];
 
   return (
     <div className="w-full p-6">
@@ -65,7 +83,8 @@ export default function SearchPage() {
           type="text"
           placeholder="Search for a movie..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          maxLength={100}
+          onChange={(e) => handleInputChange(e.target.value)}
           aria-label="Search for movies"
           className="w-full md:w-[60%] rounded-2xl p-3 text-white bg-transparent
                    border-4 border-[#00E5FF] outline-none focus:border-[#8E24AA]
@@ -88,7 +107,7 @@ export default function SearchPage() {
       )}
 
       <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
-        {results.map((movie) => (
+        {activeResults.map((movie) => (
           <Link href={`/movie/${movie.id}`} key={movie.id}>
             <div className="cursor-pointer hover:scale-105 transition-transform duration-200">
               <Image
@@ -114,14 +133,14 @@ export default function SearchPage() {
         ))}
       </div>
 
-      {search && results.length === 0 && !loading && !error && (
+      {search.trim() !== "" && activeResults.length === 0 && !loading && !error && (
         <div className="flex flex-col items-center mt-6 text-gray-400">
           <p className="text-lg">No movies found 🎬</p>
           <p className="text-sm mt-1">Try a different search term</p>
         </div>
       )}
 
-      {!search && (
+      {search.trim() === "" && (
         <div className="flex flex-col items-center mt-6 text-gray-500">
           <Search size={48} className="mb-3 opacity-50" />
           <p>Enter a movie title to search</p>
@@ -130,4 +149,3 @@ export default function SearchPage() {
     </div>
   );
 }
-

@@ -9,35 +9,38 @@ interface Props {
 }
 
 export default function ListProvider({ children }: Props) {
-  const [list, setList] = useState<Movie[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Load from localStorage on client-side only
-  useEffect(() => {
-    const saved = localStorage.getItem("favorite");
-    if (saved) {
-      try {
+  // Initialize from localStorage directly if in browser environment
+  const [list, setList] = useState<Movie[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = window.localStorage.getItem("favorite");
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          setList(parsed);
+          return parsed.filter(
+            (m): m is Movie =>
+              Boolean(m && typeof m === "object" && typeof m.id === "number" && typeof m.title === "string")
+          );
         }
-      } catch (err) {
-        console.error("Failed to parse favorites from localStorage:", err);
       }
+    } catch (err) {
+      console.error("Failed to parse favorites from localStorage:", err);
     }
-    setIsInitialized(true);
-  }, []);
+    return [];
+  });
 
   // Save to localStorage whenever list changes
   useEffect(() => {
-    if (isInitialized) {
+    try {
       if (list.length > 0) {
-        localStorage.setItem("favorite", JSON.stringify(list));
+        window.localStorage.setItem("favorite", JSON.stringify(list));
       } else {
-        localStorage.removeItem("favorite");
+        window.localStorage.removeItem("favorite");
       }
+    } catch (err) {
+      console.error("Failed to sync favorites to localStorage:", err);
     }
-  }, [list, isInitialized]);
+  }, [list]);
 
   // Helper function to remove a movie
   const removeMovie = useCallback((id: number) => {
@@ -72,4 +75,3 @@ export default function ListProvider({ children }: Props) {
 
 // Re-export Movie type for backward compatibility
 export type { Movie as Movie };
-

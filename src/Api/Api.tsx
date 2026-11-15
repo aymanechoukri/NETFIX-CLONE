@@ -1,42 +1,43 @@
+/**
+ * Client-safe API proxy for TMDB data.
+ * All requests route through Next.js server-side route handlers to keep credentials private.
+ */
 
-const API_KEY = 'f40206658ac121dd79e97b3c93b4e475';
-const BASURL = process.env.NEXT_PUBLIC_TMDB_BASE_URL || 'https://api.themoviedb.org/3';
+const ENDPOINT_MAP: Record<string, string> = {
+  "/trending/movie/week": "/api/movies/trending",
+  "/movie/popular": "/api/movies/popular",
+  "/movie/top_rated": "/api/movies/top-rated",
+};
 
-// Validate that API key is available
-if (!API_KEY) {
-  console.warn('⚠️ TMDB API key is not set. Please add NEXT_PUBLIC_TMDB_API_KEY to your .env.local file');
-}
-
-// Helper function to fetch data with better error handling
 export async function fetchFromTMDB(endpoint: string, params: Record<string, string> = {}) {
-  const url = new URL(`${BASURL}${endpoint}`);
-  url.searchParams.append('api_key', API_KEY || '');
-  
-  // Add additional params
-  Object.entries(params).forEach(([key, value]) => {
-    url.searchParams.append(key, value);
-  });
+  const targetRoute = ENDPOINT_MAP[endpoint];
 
-  try {
-    const response = await fetch(url.toString());
-    
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Invalid API key. Please check your TMDB API key in .env.local');
-      } else if (response.status === 404) {
-        throw new Error('API endpoint not found');
-      } else {
-        throw new Error(`API request failed with status: ${response.status}`);
-      }
-    }
-    
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error fetching from TMDB (${endpoint}):`, error);
-    throw error;
+  let url: string;
+  if (targetRoute) {
+    url = targetRoute;
+  } else if (endpoint.startsWith("/movie/")) {
+    const id = endpoint.replace("/movie/", "").split("?")[0];
+    url = `/api/movies/${encodeURIComponent(id)}`;
+  } else if (endpoint.startsWith("/search/movie")) {
+    const query = params.query || "";
+    url = `/api/movies/search?query=${encodeURIComponent(query)}`;
+  } else {
+    throw new Error(`Unsupported API endpoint: ${endpoint}`);
   }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    let errorMsg = `API request failed with status: ${response.status}`;
+    try {
+      const errorJson = await response.json();
+      if (errorJson.error) {
+        errorMsg = errorJson.error;
+      }
+    } catch {
+      // Use fallback error message
+    }
+    throw new Error(errorMsg);
+  }
+
+  return response.json();
 }
-
-export { API_KEY, BASURL };
-

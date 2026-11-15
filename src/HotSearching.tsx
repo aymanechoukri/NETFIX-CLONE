@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { fetchFromTMDB } from "./Api/Api";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,32 +13,35 @@ export default function HotSearching() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  const fetchMovies = useCallback(async (isRetry = false) => {
-    try {
-      if (!isRetry) {
-        setLoading(true);
-        setError(null);
-      }
-      
-      const data = await fetchFromTMDB('/movie/popular');
-      setMovies(data.results || []);
-      setError(null);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load popular movies";
-      console.error("Failed to fetch popular movies:", err);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    setRetryCount((prev) => prev + 1);
+  };
 
   useEffect(() => {
-    fetchMovies();
-  }, [fetchMovies, retryCount]);
+    let ignore = false;
+    fetchFromTMDB('/movie/popular')
+      .then((data) => {
+        if (!ignore) {
+          setMovies(data.results || []);
+          setError(null);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          const errorMessage = err instanceof Error ? err.message : "Failed to load popular movies";
+          console.error("Failed to fetch popular movies:", err);
+          setError(errorMessage);
+          setLoading(false);
+        }
+      });
 
-  const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
-  };
+    return () => {
+      ignore = true;
+    };
+  }, [retryCount]);
 
   if (loading) {
     return (
